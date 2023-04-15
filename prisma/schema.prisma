@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex", "clientExtensions"]
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Provider {
+  Google
+  Email
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  name          String
+  email         String    @unique
+  password      String
+  image         String?
+  imageName     String?
+  bio           String?
+  provider      Provider  @default(Email)
+  social        Json?     @db.Json
+  channels      Channel[]
+  subscriptions Channel[] @relation("ChannelSubscriptions")
+  followedBy    User[]    @relation("UserFollows")
+  following     User[]    @relation("UserFollows")
+  likes         Notes[]   @relation("NoteLikes")
+
+  @@fulltext([name])
+}
+
+model Channel {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String
+  description  String?
+  image        String?
+  imageName    String?
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  notes        Notes[]
+  subscribedBy User[]   @relation("ChannelSubscriptions")
+
+  @@index([userId])
+  @@fulltext([name])
+}
+
+model Notes {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  name        String
+  description String?
+  images      NoteImages[]
+  driveLink   String?
+  channelId   Int
+  channel     Channel      @relation(fields: [channelId], references: [id])
+  likedBy     User[]       @relation("NoteLikes")
+
+  @@index([channelId])
+  @@fulltext([name])
+}
+
+model NoteImages {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  noteId    Int
+  note      Notes    @relation(fields: [noteId], references: [id])
+  image     String
+  imageName String
+
+  @@id([noteId])
+  @@index([noteId])
+}
