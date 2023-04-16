@@ -12,7 +12,7 @@ export const subscribe = asyncHandler(async (req, res) => {
 
   await prisma.channel.update({
     where: { id: channel.id },
-    data: { subscribers: { connect: { id: auth.id } } },
+    data: { subscribedBy: { connect: { id: auth.id } } },
   });
 
   res.status(201).json({ message: "Subscribed" });
@@ -29,7 +29,7 @@ export const unsubscribe = asyncHandler(async (req, res) => {
 
   await prisma.channel.update({
     where: { id: channel.id },
-    data: { subscribers: { disconnect: { id: auth.id } } },
+    data: { subscribedBy: { disconnect: { id: auth.id } } },
   });
 
   res.status(201).json({ message: "Unsubscribed" });

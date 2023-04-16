@@ -133,11 +133,7 @@ export const createChannel = asyncHandler(async (req, res) => {
 
     const filename = file.mimetype.replace(CONTENT_TYPE.IMAGE, `${uuid}.`);
 
-    const fileUrl = await uploadFile(
-      file.data,
-      file.mimetype,
-      `${FILE_DIR.CHANNELS}/${filename}`
-    );
+    const fileUrl = await uploadFile(file, `${FILE_DIR.CHANNELS}/${filename}`);
 
     await prisma.channel.update({
       where: { id: channelId },
@@ -197,11 +193,7 @@ export const updateChannel = asyncHandler(async (req, res) => {
 
     const filename = file.mimetype.replace(CONTENT_TYPE.IMAGE, `${uuid}.`);
 
-    const fileUrl = await uploadFile(
-      file.data,
-      file.mimetype,
-      `${FILE_DIR.CHANNELS}/${filename}`
-    );
+    const fileUrl = await uploadFile(file, `${FILE_DIR.CHANNELS}/${filename}`);
 
     await prisma.channel.update({
       where: { id: channelId },

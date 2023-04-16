@@ -8,6 +8,7 @@ import {
   updateChannel,
 } from "../controllers/channel";
 import { subscribe, unsubscribe } from "../controllers/channel/subscribe";
+import { notes } from "../controllers/channel/notes";
 
 const router = Router();
 
@@ -26,5 +27,7 @@ router.post("/", createChannel);
 router.post("/:id/subscribe", subscribe);
 
 router.delete("/:id/subscribe", unsubscribe);
+
+router.get("/:id/note", notes);
 
 export default router;

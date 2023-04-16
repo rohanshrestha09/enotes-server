@@ -25,8 +25,8 @@ router.get("/followers", followers);
 
 router.get("/following", following);
 
-router.get("/channels", channels);
+router.get("/channel", channels);
 
-router.get("/subscriptions", subscriptions);
+router.get("/subscription", subscriptions);
 
 export default router;

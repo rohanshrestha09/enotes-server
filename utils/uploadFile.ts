@@ -1,7 +1,8 @@
+import { UploadedFile } from "express-fileupload";
 import { getStorage } from "firebase-admin/storage";
 import { v4 as uuidV4 } from "uuid";
 
-export default async (targetFile: Buffer, contentType: string, filename: string) => {
+export default async (targetFile: UploadedFile, filename: string) => {
   const storageRef = getStorage().bucket();
 
   const uuid = uuidV4();
@@ -9,8 +10,11 @@ export default async (targetFile: Buffer, contentType: string, filename: string)
   const file = storageRef.file(filename);
 
   await file
-    .save(targetFile, {
-      metadata: { contentType, firebaseStorageDownloadTokens: uuid },
+    .save(targetFile.data, {
+      metadata: {
+        contentType: targetFile.mimetype,
+        firebaseStorageDownloadTokens: uuid,
+      },
     })
     .then(async () => await file.makePublic());
 

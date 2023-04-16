@@ -86,11 +86,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
     const filename = file.mimetype.replace(CONTENT_TYPE.IMAGE, `${uuid}.`);
 
-    const fileUrl = await uploadFile(
-      file.data,
-      file.mimetype,
-      `${FILE_DIR.USERS}/${filename}`
-    );
+    const fileUrl = await uploadFile(file, `${FILE_DIR.USERS}/${filename}`);
 
     await prisma.user.update({
       where: { id: authId },

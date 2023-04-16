@@ -72,6 +72,7 @@ model Notes {
 }
 
 model NoteImages {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   noteId    Int
@@ -79,6 +80,5 @@ model NoteImages {
   image     String
   imageName String
 
-  @@id([noteId])
   @@index([noteId])
 }

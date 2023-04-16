@@ -37,7 +37,7 @@ export const subscriptions = asyncHandler(async (req, res) => {
   const { id: authId } = res.locals.auth;
 
   const count = await prisma.channel.count({
-    where: { subscribers: { some: { id: authId } } },
+    where: { subscribedBy: { some: { id: authId } } },
   });
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
