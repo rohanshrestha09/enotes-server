@@ -30,10 +30,11 @@ model User {
   provider      Provider  @default(Email)
   social        Json?     @db.Json
   channels      Channel[]
+  notes         Note[]
   subscriptions Channel[] @relation("ChannelSubscriptions")
   followedBy    User[]    @relation("UserFollows")
   following     User[]    @relation("UserFollows")
-  likes         Notes[]   @relation("NoteLikes")
+  likes         Note[]    @relation("NoteLikes")
 
   @@fulltext([name])
 }
@@ -48,35 +49,38 @@ model Channel {
   imageName    String?
   userId       Int
   user         User     @relation(fields: [userId], references: [id])
-  notes        Notes[]
+  notes        Note[]
   subscribedBy User[]   @relation("ChannelSubscriptions")
 
   @@index([userId])
   @@fulltext([name])
 }
 
-model Notes {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+model Note {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   name        String
   description String?
-  images      NoteImages[]
+  images      NoteImage[]
   driveLink   String?
   channelId   Int
-  channel     Channel      @relation(fields: [channelId], references: [id])
-  likedBy     User[]       @relation("NoteLikes")
+  channel     Channel     @relation(fields: [channelId], references: [id])
+  userId      Int
+  user        User        @relation(fields: [userId], references: [id])
+  likedBy     User[]      @relation("NoteLikes")
 
   @@index([channelId])
+  @@index([userId])
   @@fulltext([name])
 }
 
-model NoteImages {
+model NoteImage {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   noteId    Int
-  note      Notes    @relation(fields: [noteId], references: [id])
+  note      Note     @relation(fields: [noteId], references: [id])
   image     String
   imageName String
 

@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Joi from "joi";
 import prisma from "../prisma";
 import { HttpException } from "../utils/error";
+import { selectUserField } from "../utils/prisma";
 
 const verifyNote = asyncHandler(async (req, res, next) => {
   try {
@@ -9,10 +10,20 @@ const verifyNote = asyncHandler(async (req, res, next) => {
       id: Joi.number().required(),
     }).validateAsync(req.params);
 
-    const note = await prisma.notes.findUnique({
+    const note = await prisma.note.findUnique({
       where: { id },
       include: {
-        _count: true,
+        channel: {
+          include: {
+            _count: true,
+          },
+        },
+        user: {
+          select: {
+            ...selectUserField,
+            _count: true,
+          },
+        },
         images: {
           select: {
             id: true,
@@ -20,6 +31,7 @@ const verifyNote = asyncHandler(async (req, res, next) => {
             imageName: true,
           },
         },
+        _count: true,
       },
     });
 

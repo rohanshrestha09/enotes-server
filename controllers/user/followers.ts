@@ -3,7 +3,7 @@ import prisma from "../../prisma";
 import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const followers = asyncHandler(async (req, res) => {
-  // #swagger.tags = ["Auth Profile"]
+  // #swagger.tags = ["User"]
   // #swagger.summary = "Get followers"
   /* #swagger.security = [{
                "bearerAuth": []
@@ -33,10 +33,10 @@ export const followers = asyncHandler(async (req, res) => {
             }
     } */
 
-  const { id: authId } = res.locals.auth;
+  const { id: userId } = res.locals.user;
 
   const count = await prisma.user.count({
-    where: { following: { some: { id: authId } } },
+    where: { following: { some: { id: userId } } },
   });
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
@@ -45,7 +45,7 @@ export const followers = asyncHandler(async (req, res) => {
   const data = await prisma.user
     .findUnique({
       where: {
-        id: authId,
+        id: userId,
       },
     })
     .followedBy({
@@ -75,7 +75,7 @@ export const followers = asyncHandler(async (req, res) => {
 });
 
 export const following = asyncHandler(async (req, res) => {
-  // #swagger.tags = ["Auth Profile"]
+  // #swagger.tags = ["User"]
   // #swagger.summary = "Get following"
   /* #swagger.security = [{
                  "bearerAuth": []
@@ -105,10 +105,10 @@ export const following = asyncHandler(async (req, res) => {
             }
     } */
 
-  const { id: authId } = res.locals.auth;
+  const { id: userId } = res.locals.user;
 
   const count = await prisma.user.count({
-    where: { followedBy: { some: { id: authId } } },
+    where: { followedBy: { some: { id: userId } } },
   });
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
@@ -117,7 +117,7 @@ export const following = asyncHandler(async (req, res) => {
   const data = await prisma.user
     .findUnique({
       where: {
-        id: authId,
+        id: userId,
       },
     })
     .following({

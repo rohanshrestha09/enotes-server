@@ -3,7 +3,7 @@ import prisma from "../../prisma";
 import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const channels = asyncHandler(async (req, res) => {
-  // #swagger.tags = ["Auth Profile"]
+  // #swagger.tags = ["User"]
   // #swagger.summary = "Get channels"
   /* #swagger.security = [{
                  "bearerAuth": []
@@ -23,7 +23,7 @@ export const channels = asyncHandler(async (req, res) => {
   /*  #swagger.parameters['sort'] = {
             in: 'query',
             schema: {
-                '@enum': ['id', 'createdAt','name', 'subscribedBy']
+                '@enum': ['id', 'createdAt', 'subscribedBy']
             }
     } */
   /*  #swagger.parameters['order'] = {
@@ -33,10 +33,10 @@ export const channels = asyncHandler(async (req, res) => {
             }
     } */
 
-  const { id: authId } = res.locals.auth;
+  const { id: userId } = res.locals.user;
 
   const count = await prisma.channel.count({
-    where: { userId: authId },
+    where: { userId },
   });
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
@@ -44,7 +44,7 @@ export const channels = asyncHandler(async (req, res) => {
 
   const data = await prisma.channel.findMany({
     where: {
-      userId: authId,
+      userId,
       name: { search },
     },
     include: {

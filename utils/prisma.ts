@@ -57,3 +57,14 @@ export async function parseQuery(
     search: search && `${search}*`,
   };
 }
+
+export const selectUserField = {
+  id: true,
+  name: true,
+  bio: true,
+  image: true,
+  imageName: true,
+  social: true,
+  createdAt: true,
+  updatedAt: true,
+};

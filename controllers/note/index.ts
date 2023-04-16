@@ -6,7 +6,7 @@ import { v4 as uuidV4 } from "uuid";
 import uploadFile from "../../utils/uploadFile";
 import { CONTENT_TYPE, FILE_DIR } from "../../interface";
 import { HttpException } from "../../utils/error";
-import { parseQuery } from "../../utils/prisma";
+import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const note = asyncHandler(async (req, res) => {
   // #swagger.tags = ["Note"]
@@ -49,17 +49,27 @@ export const notes = asyncHandler(async (req, res) => {
               }
       } */
 
-  const count = await prisma.notes.count({});
+  const count = await prisma.note.count({});
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
     await parseQuery(req.query, { count });
 
-  const data = await prisma.notes.findMany({
+  const data = await prisma.note.findMany({
     where: {
       name: search,
     },
     include: {
-      _count: true,
+      channel: {
+        include: {
+          _count: true,
+        },
+      },
+      user: {
+        select: {
+          ...selectUserField,
+          _count: true,
+        },
+      },
       images: {
         select: {
           id: true,
@@ -67,6 +77,7 @@ export const notes = asyncHandler(async (req, res) => {
           imageName: true,
         },
       },
+      _count: true,
     },
     skip,
     take,
@@ -86,7 +97,7 @@ export const createNote = asyncHandler(async (req, res) => {
   /* #swagger.security = [{
                  "bearerAuth": []
     }] */
-  /* #swagger.parameters['id'] = {
+  /* #swagger.parameters['channel'] = {
         in: "path",
         description: "Channel id",
         required: true,
@@ -122,7 +133,15 @@ export const createNote = asyncHandler(async (req, res) => {
           }
       */
 
-  const { id: channelId } = res.locals.channel;
+  const { channel: id } = await Joi.object({
+    channel: Joi.number().required(),
+  }).validateAsync(req.params);
+
+  const channel = await prisma.channel.findUnique({ where: { id } });
+
+  if (!channel) throw new HttpException(404, "Channel does not exist");
+
+  const { auth } = res.locals;
 
   const { name, description, driveLink } = await Joi.object({
     name: Joi.string().required(),
@@ -136,9 +155,10 @@ export const createNote = asyncHandler(async (req, res) => {
     ),
   }).validateAsync(req.body);
 
-  const { id: noteId } = await prisma.notes.create({
+  const { id: noteId } = await prisma.note.create({
     data: {
-      channelId,
+      channelId: channel.id,
+      userId: auth.id,
       name,
       description,
       driveLink,
@@ -160,7 +180,7 @@ export const createNote = asyncHandler(async (req, res) => {
 
       const fileUrl = await uploadFile(file, `${FILE_DIR.NOTES}/${filename}`);
 
-      await prisma.noteImages.create({
+      await prisma.noteImage.create({
         data: { noteId, image: fileUrl, imageName: filename },
       });
     }

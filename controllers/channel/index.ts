@@ -7,7 +7,7 @@ import { HttpException } from "../../utils/error";
 import uploadFile from "../../utils/uploadFile";
 import deleteFile from "../../utils/deleteFile";
 import { CONTENT_TYPE, FILE_DIR } from "../../interface";
-import { parseQuery } from "../../utils/prisma";
+import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const channel = asyncHandler(async (req, res) => {
   // #swagger.tags = ["Channel"]
@@ -42,7 +42,7 @@ export const channels = asyncHandler(async (req, res) => {
   /*  #swagger.parameters['sort'] = {
             in: 'query',
             schema: {
-                '@enum': ['id', 'createdAt', 'subscribedBy']
+                '@enum': ['id', 'createdAt','name', 'subscribedBy']
             }
     } */
   /*  #swagger.parameters['order'] = {
@@ -62,6 +62,12 @@ export const channels = asyncHandler(async (req, res) => {
       name: search,
     },
     include: {
+      user: {
+        select: {
+          ...selectUserField,
+          _count: true,
+        },
+      },
       _count: true,
     },
     skip,

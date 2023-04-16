@@ -3,49 +3,49 @@ import prisma from "../../prisma";
 import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const notes = asyncHandler(async (req, res) => {
-  // #swagger.tags = ["Channel"]
+  // #swagger.tags = ["User"]
   // #swagger.summary = "Get notes"
   /* #swagger.security = [{
-               "bearerAuth": []
-  }] */
+                     "bearerAuth": []
+        }] */
   /* #swagger.parameters['page'] = {
-        in: "query",
-        type: "integer",
-    } */
+              in: "query",
+              type: "integer",
+          } */
   /* #swagger.parameters['size'] = {
-        in: "query",
-        type: "integer",
-    } */
+              in: "query",
+              type: "integer",
+          } */
   /* #swagger.parameters['search'] = {
-        in: "query",
-        type: "string",
-    } */
+              in: "query",
+              type: "string",
+          } */
   /*  #swagger.parameters['sort'] = {
-            in: 'query',
-            schema: {
-                '@enum': ['id', 'createdAt','name', 'likedBy']
-            }
-    } */
+                in: 'query',
+                schema: {
+                    '@enum': ['id', 'createdAt', 'likedBy']
+                }
+        } */
   /*  #swagger.parameters['order'] = {
-            in: 'query',
-            schema: {
-                '@enum': ['asc', 'desc']
-            }
-    } */
+                in: 'query',
+                schema: {
+                    '@enum': ['asc', 'desc']
+                }
+        } */
 
-  const { id: channelId } = res.locals.channel;
+  const { id: userId } = res.locals.user;
 
-  const count = await prisma.note.count({ where: { channelId } });
+  const count = await prisma.note.count({
+    where: { userId },
+  });
 
   const { currentPage, totalPage, search, skip, take, sort, order } =
     await parseQuery(req.query, { count });
 
   const data = await prisma.note.findMany({
     where: {
-      channelId,
-      name: {
-        search,
-      },
+      userId,
+      name: search,
     },
     include: {
       channel: {
@@ -61,6 +61,7 @@ export const notes = asyncHandler(async (req, res) => {
       },
       images: {
         select: {
+          id: true,
           image: true,
           imageName: true,
         },
@@ -74,11 +75,7 @@ export const notes = asyncHandler(async (req, res) => {
     },
   });
 
-  res.status(200).json({
-    data,
-    currentPage,
-    totalPage,
-    count,
-    message: "Notes fetched",
-  });
+  res
+    .status(200)
+    .json({ data, currentPage, totalPage, count, message: "Notes fetched" });
 });

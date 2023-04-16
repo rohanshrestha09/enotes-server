@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import prisma from "../../prisma";
-import { parseQuery } from "../../utils/prisma";
+import { parseQuery, selectUserField } from "../../utils/prisma";
 
 export const subscriptions = asyncHandler(async (req, res) => {
   // #swagger.tags = ["Auth Profile"]
@@ -24,7 +24,7 @@ export const subscriptions = asyncHandler(async (req, res) => {
   /*  #swagger.parameters['sort'] = {
             in: 'query',
             schema: {
-                '@enum': ['id', 'createdAt', 'subscribedBy']
+                '@enum': ['id', 'createdAt','name', 'subscribedBy']
             }
     } */
   /*  #swagger.parameters['order'] = {
@@ -56,6 +56,12 @@ export const subscriptions = asyncHandler(async (req, res) => {
         },
       },
       include: {
+        user: {
+          select: {
+            ...selectUserField,
+            _count: true,
+          },
+        },
         _count: true,
       },
       skip,

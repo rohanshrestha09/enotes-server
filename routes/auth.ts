@@ -5,6 +5,7 @@ import { authHandler, updateProfile } from "../controllers/auth";
 import { follow, unfollow } from "../controllers/auth/follow";
 import { followers, following } from "../controllers/auth/followers";
 import { channels } from "../controllers/auth/channels";
+import { likes, notes } from "../controllers/auth/note";
 import { subscriptions } from "../controllers/auth/subscriptions";
 
 const router = Router();
@@ -26,6 +27,10 @@ router.get("/followers", followers);
 router.get("/following", following);
 
 router.get("/channel", channels);
+
+router.get("/note", notes);
+
+router.get("/like", likes);
 
 router.get("/subscription", subscriptions);
 
